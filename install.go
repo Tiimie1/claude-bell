@@ -79,17 +79,19 @@ func cmdInstall() {
 			filtered = append(filtered, entry)
 		}
 
-		newHook := map[string]any{
-			"type":        "command",
-			"command":     fmt.Sprintf("%s play %s", exePath, hd.event),
-			"async":       true,
+		newEntry := map[string]any{
 			"_claude_bell": true,
-		}
-		if hd.matcher != "" {
-			newHook["matcher"] = hd.matcher
+			"matcher":      hd.matcher,
+			"hooks": []any{
+				map[string]any{
+					"type":    "command",
+					"command": fmt.Sprintf("%s play %s", exePath, hd.event),
+					"async":   true,
+				},
+			},
 		}
 
-		filtered = append(filtered, newHook)
+		filtered = append(filtered, newEntry)
 		hooks[hookKey] = filtered
 	}
 
@@ -139,6 +141,7 @@ func cmdUninstall() {
 				filtered = append(filtered, entry)
 				continue
 			}
+			// Check for _claude_bell marker (new nested format)
 			if _, isBell := m["_claude_bell"]; isBell {
 				removed++
 				continue
