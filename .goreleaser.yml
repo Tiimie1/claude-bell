@@ -1,0 +1,30 @@
+version: 2
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+
+brews:
+  - repository:
+      owner: Tiimie1
+      name: homebrew-tap
+    homepage: "https://github.com/Tiimie1/claude-bell"
+    description: "Notification sounds for Claude Code"
+    license: "MIT"
+    install: |
+      bin.install "claude-bell"
