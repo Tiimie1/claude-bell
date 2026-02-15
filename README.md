@@ -1,6 +1,22 @@
-# claude-bell
+# :bell: Claude Bell
 
-Notification sounds for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Get an audible chime when Claude finishes a task, needs your attention, or hits a context limit.
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo.png">
+    <img src="assets/logo.png" alt="Claude Bell" width="500">
+  </picture>
+</p>
+
+<p align="center">
+  <strong>Notification sounds for Claude Code</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Tiimie1/claude-bell/releases"><img src="https://img.shields.io/github/v/release/Tiimie1/claude-bell?include_prereleases&style=for-the-badge" alt="GitHub release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
+</p>
+
+Get an audible chime when Claude finishes a task, needs your attention, or hits a context limit.
 
 No dependencies. Pure Go. Generates sine-wave WAV files and plays them with macOS `afplay`.
 
