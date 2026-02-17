@@ -20,18 +20,30 @@ func ensureSound(event, presetName string) (string, error) {
 		return path, nil
 	}
 
-	presets, ok := EventPresets[event]
-	if !ok {
-		return "", fmt.Errorf("unknown event: %s", event)
-	}
-	for _, p := range presets {
-		if p.Name == presetName {
-			if err := generateWAV(path, p.Tones); err != nil {
-				return "", err
+	// Check built-in presets
+	if presets, ok := EventPresets[event]; ok {
+		for _, p := range presets {
+			if p.Name == presetName {
+				if err := generateWAV(path, p.Tones); err != nil {
+					return "", err
+				}
+				return path, nil
 			}
-			return path, nil
 		}
 	}
+
+	// Fall back to custom sounds
+	cs, err := findCustomSound(presetName)
+	if err != nil {
+		return "", err
+	}
+	if cs != nil {
+		if err := generateWAV(path, cs.Tones); err != nil {
+			return "", err
+		}
+		return path, nil
+	}
+
 	return "", fmt.Errorf("unknown preset %q for event %q", presetName, event)
 }
 

@@ -49,6 +49,30 @@ func loadConfig() (Config, error) {
 	return cfg, err
 }
 
+func getConfigField(cfg Config, event string) string {
+	switch event {
+	case "stop":
+		return cfg.Stop
+	case "notification":
+		return cfg.Notification
+	case "limit":
+		return cfg.Limit
+	}
+	return ""
+}
+
+func setConfigField(cfg Config, event, value string) Config {
+	switch event {
+	case "stop":
+		cfg.Stop = value
+	case "notification":
+		cfg.Notification = value
+	case "limit":
+		cfg.Limit = value
+	}
+	return cfg
+}
+
 func saveConfig(cfg Config) error {
 	dir := configDir()
 	if err := os.MkdirAll(dir, 0755); err != nil {
