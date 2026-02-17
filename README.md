@@ -64,11 +64,14 @@ claude-bell install
 ## Usage
 
 ```
-claude-bell setup       Pick a sound for each event
-claude-bell test        Play all configured sounds
-claude-bell install     Add hooks to ~/.claude/settings.json
-claude-bell uninstall   Remove hooks from ~/.claude/settings.json
-claude-bell play <event>  Play sound for an event (used by hooks)
+claude-bell setup                  Pick a sound for each event
+claude-bell test                   Play all configured sounds
+claude-bell install                Add hooks to ~/.claude/settings.json
+claude-bell uninstall              Remove hooks from ~/.claude/settings.json
+claude-bell play <event>           Play sound for an event (used by hooks)
+claude-bell create <name> <code>   Create a custom sound from an encoded string
+claude-bell list                   List all custom sounds
+claude-bell delete <name>          Delete a custom sound
 ```
 
 ## How it works
@@ -92,6 +95,25 @@ Config is stored in `~/.config/claude-bell/config.json`. Generated WAV files are
 | **limit** | Descending Warning | G-D-A falling pattern |
 | | Low Buzz | Triple pulse on A3 |
 | | Slide Down | E5 to E3 octave drop |
+
+## Custom sounds
+
+Create your own notification sounds using the [Sound Creator](https://tiimie1.github.io/claude-bell/) web app:
+
+1. Open the Sound Creator and click **Record**
+2. Play notes on the piano keyboard (or use your computer keyboard)
+3. Click **Stop** when done, then **Copy** the generated code
+4. Create the sound:
+   ```bash
+   claude-bell create "My Sound" <paste-code-here>
+   ```
+5. Run `claude-bell setup` — your custom sound will appear alongside the built-in presets
+
+Manage custom sounds:
+```bash
+claude-bell list              # Show all custom sounds
+claude-bell delete "My Sound" # Remove a custom sound
+```
 
 ## Building from source
 

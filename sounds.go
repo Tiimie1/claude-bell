@@ -2,8 +2,8 @@ package main
 
 // Tone represents a single sine-wave tone with frequency and duration.
 type Tone struct {
-	Freq     float64 // Hz
-	Duration float64 // seconds
+	Freq     float64 `json:"freq"`     // Hz
+	Duration float64 `json:"duration"` // seconds
 }
 
 // SoundPreset defines a named sequence of tones.

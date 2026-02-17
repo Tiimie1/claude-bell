@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Bell - Sound Creator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bell: {
+              50: '#fffbeb',
+              100: '#fef3c7',
+              200: '#fde68a',
+              300: '#fcd34d',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background: #fafafa;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      box-shadow:
+        0 1px 3px rgba(0,0,0,0.04),
+        0 4px 12px rgba(0,0,0,0.03);
+      transition: box-shadow 0.2s ease;
+    }
+    .card:hover {
+      box-shadow:
+        0 1px 3px rgba(0,0,0,0.04),
+        0 6px 16px rgba(0,0,0,0.06);
+    }
+
+    .piano-wrapper {
+      background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+      padding: 20px 24px 16px;
+      border-radius: 16px;
+      box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .keyboard { display: flex; position: relative; }
+
+    .key-white {
+      width: 44px; height: 170px;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fafb 60%, #f3f4f6 100%);
+      border: 1px solid #d1d5db;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.04s ease;
+      box-shadow:
+        0 2px 4px rgba(0,0,0,0.08),
+        inset 0 -2px 3px rgba(0,0,0,0.03);
+    }
+    .key-white:hover {
+      background: linear-gradient(180deg, #ffffff 0%, #fef3c7 100%);
+    }
+    .key-white:active, .key-white.active {
+      background: linear-gradient(180deg, #fde68a 0%, #fcd34d 100%);
+      box-shadow:
+        0 1px 2px rgba(0,0,0,0.05),
+        inset 0 1px 3px rgba(0,0,0,0.06);
+      transform: translateY(1px);
+    }
+
+    .key-black {
+      width: 30px; height: 110px;
+      background: linear-gradient(180deg, #374151 0%, #1f2937 40%, #111827 100%);
+      border-radius: 0 0 5px 5px;
+      margin-left: -15px;
+      margin-right: -15px;
+      z-index: 10;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.04s ease;
+      box-shadow:
+        0 3px 6px rgba(0,0,0,0.3),
+        inset 0 -1px 2px rgba(255,255,255,0.05);
+    }
+    .key-black:hover {
+      background: linear-gradient(180deg, #4b5563 0%, #374151 40%, #1f2937 100%);
+    }
+    .key-black:active, .key-black.active {
+      background: linear-gradient(180deg, #92400e 0%, #78350f 100%);
+      box-shadow:
+        0 1px 3px rgba(0,0,0,0.3),
+        inset 0 1px 2px rgba(0,0,0,0.2);
+      transform: translateY(1px);
+    }
+
+    .tone-block { animation: fadeIn 0.15s ease-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn {
+      font-weight: 500;
+      border-radius: 10px;
+      padding: 10px 20px;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .btn:active { transform: translateY(1px); box-shadow: none; }
+
+    .btn-record { background: transparent; color: #ef4444; border: 1.5px solid #ef4444; }
+    .btn-record:hover { background: #fef2f2; }
+    .btn-stop { background: #374151; color: white; border: 1.5px solid #374151; }
+    .btn-stop:hover { background: #1f2937; }
+    .btn-clear { background: transparent; color: #6b7280; border: 1.5px solid #d1d5db; }
+    .btn-clear:hover { background: #f3f4f6; }
+    .btn-preview { background: transparent; color: #d97706; border: 1.5px solid #d97706; }
+    .btn-preview:hover { background: #fffbeb; }
+    .btn-apply { background: transparent; color: #059669; border: 1.5px solid #059669; }
+    .btn-apply:hover { background: #ecfdf5; }
+
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #d97706;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div class="max-w-3xl mx-auto px-4 py-10">
+
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <img src="../assets/bell.png" alt="Claude Bell" class="w-24 h-24 mx-auto mb-4 drop-shadow-lg">
+      <h1 class="text-3xl font-bold text-gray-900 mb-1">Sound Creator</h1>
+      <p class="text-gray-500 text-sm">Play notes on the piano to create a custom notification sound for <a href="https://github.com/Tiimie1/claude-bell" class="text-bell-600 hover:text-bell-700 underline underline-offset-2">Claude Bell</a></p>
+    </div>
+
+    <!-- Piano -->
+    <div class="card rounded-2xl p-6 mb-5">
+      <span class="section-label">Piano</span>
+      <div class="flex justify-center mt-3 mb-4">
+        <div class="piano-wrapper">
+          <div class="keyboard" id="keyboard"></div>
+        </div>
+      </div>
+      <p class="text-center text-xs text-gray-400">Keyboard: <span class="font-mono bg-gray-100 px-1 rounded">Z S X D C V G B H N J M ,</span> for C4-C5 &bull; <span class="font-mono bg-gray-100 px-1 rounded">Q 2 W 3 E R 5 T 6 Y 7 U I</span> for C5-C6</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="card rounded-2xl p-6 mb-5">
+      <span class="section-label">Recording</span>
+      <div class="flex items-center gap-3 mt-3 mb-4">
+        <button id="btnRecord" onclick="toggleRecording()" class="btn btn-record">Record</button>
+        <button onclick="clearRecording()" class="btn btn-clear">Clear</button>
+        <button onclick="previewSound()" class="btn btn-preview">Preview</button>
+        <span id="recordingStatus" class="text-sm text-gray-400 ml-1"></span>
+      </div>
+      <div id="tonesList" class="flex flex-wrap gap-2 min-h-[32px]"></div>
+    </div>
+
+    <!-- JSON Editor -->
+    <div id="editorSection" class="card rounded-2xl p-6 mb-5 hidden">
+      <div class="flex items-center justify-between mb-1">
+        <span class="section-label">Editor</span>
+        <div class="flex items-center gap-2">
+          <span id="editorError" class="text-xs text-red-500"></span>
+          <button onclick="applyJson()" class="btn btn-apply text-sm !px-4 !py-1.5">Apply</button>
+          <button onclick="previewFromEditor()" class="btn btn-preview text-sm !px-4 !py-1.5">Preview</button>
+        </div>
+      </div>
+      <p class="text-xs text-gray-400 mb-2 mt-2">MIDI note (0 = silence, 60 = C4, 72 = C5) &bull; duration in seconds &bull; <code class="text-gray-500">"note"</code> is display-only — only edit <code class="text-gray-500">midi</code> and <code class="text-gray-500">duration</code></p>
+      <textarea id="jsonEditor" class="w-full h-48 bg-gray-50/80 border border-gray-200 rounded-xl p-4 font-mono text-sm text-gray-800 resize-y focus:outline-none focus:ring-2 focus:ring-bell-300 focus:border-bell-300" spellcheck="false"></textarea>
+    </div>
+
+    <!-- Output -->
+    <div id="outputSection" class="card rounded-2xl p-6 hidden">
+      <span class="section-label">Output</span>
+      <div class="relative bg-gray-900 rounded-xl p-4 mt-3 shadow-inner">
+        <code id="cmdOutput" class="text-green-400 text-sm font-mono"><span class="text-gray-500">$ </span></code>
+        <button onclick="copyCode()" id="btnCopy" class="absolute top-3 right-3 text-gray-500 hover:text-gray-300 transition-colors" title="Copy command">
+          <svg id="copyIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <svg id="checkIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-xs text-gray-300 mt-10">Built by <a href="https://github.com/Tiimie1" class="text-gray-400 hover:text-gray-500 underline underline-offset-2">Tiimie1</a></p>
+  </div>
+
+<script>
+// -- MIDI / Frequency helpers --
+function midiToFreq(midi) {
+  if (midi === 0) return 0;
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
+
+function freqToMidi(freq) {
+  if (freq <= 0) return 0;
+  return Math.round(69 + 12 * Math.log2(freq / 440));
+}
+
+function midiToNoteName(midi) {
+  const names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const octave = Math.floor(midi / 12) - 1;
+  return names[midi % 12] + octave;
+}
+
+// -- Codec (matches Go implementation) --
+function encodeTones(tones) {
+  const bytes = new Uint8Array(tones.length * 2);
+  for (let i = 0; i < tones.length; i++) {
+    bytes[i * 2] = tones[i].midi;
+    let ticks = Math.round(tones[i].duration * 100);
+    if (ticks > 255) ticks = 255;
+    if (ticks < 0) ticks = 0;
+    bytes[i * 2 + 1] = ticks;
+  }
+  let b64 = btoa(String.fromCharCode(...bytes));
+  b64 = b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return b64;
+}
+
+function decodeTones(code) {
+  let b64 = code.replace(/-/g, '+').replace(/_/g, '/');
+  while (b64.length % 4 !== 0) b64 += '=';
+  const raw = atob(b64);
+  const bytes = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+  if (bytes.length % 2 !== 0) return [];
+  const tones = [];
+  for (let i = 0; i < bytes.length; i += 2) {
+    tones.push({ midi: bytes[i], duration: bytes[i+1] / 100 });
+  }
+  return tones;
+}
+
+// -- Web Audio --
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new AudioContext();
+  return audioCtx;
+}
+
+// -- Piano Keyboard --
+const KEYS = [];
+for (let midi = 60; midi <= 84; midi++) {
+  const note = midi % 12;
+  const isBlack = [1, 3, 6, 8, 10].includes(note);
+  KEYS.push({ midi, isBlack, name: midiToNoteName(midi) });
+}
+
+const KEY_MAP = {
+  'z':60,'s':61,'x':62,'d':63,'c':64,'v':65,'g':66,'b':67,'h':68,'n':69,'j':70,'m':71,',':72,
+  'q':72,'2':73,'w':74,'3':75,'e':76,'r':77,'5':78,'t':79,'6':80,'y':81,'7':82,'u':83,'i':84
+};
+
+function buildKeyboard() {
+  const kb = document.getElementById('keyboard');
+  KEYS.forEach(k => {
+    const el = document.createElement('div');
+    el.className = k.isBlack ? 'key-black' : 'key-white';
+    el.dataset.midi = k.midi;
+    el.title = k.name;
+    if (!k.isBlack) {
+      const label = document.createElement('div');
+      label.className = 'text-[10px] text-gray-400 text-center pointer-events-none select-none';
+      label.style.paddingTop = '140px';
+      label.textContent = k.name;
+      el.appendChild(label);
+    }
+    el.addEventListener('mousedown', (e) => { e.preventDefault(); noteOn(k.midi, el); });
+    el.addEventListener('mouseup', () => noteOff(k.midi, el));
+    el.addEventListener('mouseleave', () => noteOff(k.midi, el));
+    el.addEventListener('touchstart', (e) => { e.preventDefault(); noteOn(k.midi, el); }, { passive: false });
+    el.addEventListener('touchend', () => noteOff(k.midi, el));
+    kb.appendChild(el);
+  });
+}
+
+// -- Recording state --
+let recording = false;
+let recordedTones = [];
+let activeNotes = {};
+let lastNoteEndTime = null;
+
+function toggleRecording() {
+  recording = !recording;
+  const btn = document.getElementById('btnRecord');
+  const status = document.getElementById('recordingStatus');
+  if (recording) {
+    btn.textContent = 'Stop';
+    btn.className = 'btn btn-stop';
+    status.textContent = 'Recording...';
+  } else {
+    btn.textContent = 'Record';
+    btn.className = 'btn btn-record';
+    status.textContent = '';
+    updateOutput();
+  }
+}
+
+function noteOn(midi, el) {
+  if (activeNotes[midi]) return;
+  const ctx = getAudioCtx();
+  const freq = midiToFreq(midi);
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  gain.gain.setValueAtTime(0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.005);
+  osc.start();
+  activeNotes[midi] = { startTime: performance.now(), el, osc, gain };
+  if (el) el.classList.add('active');
+}
+
+function noteOff(midi, el) {
+  const note = activeNotes[midi];
+  if (!note) return;
+  delete activeNotes[midi];
+  if (note.el) note.el.classList.remove('active');
+
+  const ctx = getAudioCtx();
+  const ctxNow = ctx.currentTime;
+  note.gain.gain.cancelScheduledValues(ctxNow);
+  note.gain.gain.setValueAtTime(note.gain.gain.value, ctxNow);
+  note.gain.gain.linearRampToValueAtTime(0, ctxNow + 0.005);
+  note.osc.stop(ctxNow + 0.005);
+
+  if (!recording) return;
+
+  const perfNow = performance.now();
+  const holdSec = Math.max(0.01, (perfNow - note.startTime) / 1000);
+
+  if (lastNoteEndTime !== null) {
+    const gapMs = note.startTime - lastNoteEndTime;
+    if (gapMs > 20) {
+      recordedTones.push({ midi: 0, duration: Math.min(gapMs / 1000, 2.55) });
+    }
+  }
+
+  recordedTones.push({ midi, duration: Math.min(holdSec, 2.55) });
+  lastNoteEndTime = perfNow;
+  renderTones();
+}
+
+function clearRecording() {
+  recordedTones = [];
+  lastNoteEndTime = null;
+  renderTones();
+  document.getElementById('editorSection').classList.add('hidden');
+  document.getElementById('outputSection').classList.add('hidden');
+}
+
+function renderTones() {
+  const container = document.getElementById('tonesList');
+  container.innerHTML = '';
+  recordedTones.forEach((t, i) => {
+    const el = document.createElement('span');
+    const ms = Math.round(t.duration * 1000);
+    if (t.midi === 0) {
+      el.className = 'tone-block inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-400 cursor-pointer hover:bg-gray-200 transition-colors';
+      el.textContent = `gap ${ms}ms`;
+    } else {
+      el.className = 'tone-block inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-bell-100 text-bell-700 cursor-pointer hover:bg-bell-200 transition-colors';
+      el.textContent = `${midiToNoteName(t.midi)} ${ms}ms`;
+    }
+    el.title = 'Click to remove';
+    el.addEventListener('click', () => {
+      recordedTones.splice(i, 1);
+      renderTones();
+      updateOutput();
+    });
+    container.appendChild(el);
+  });
+}
+
+function tonesToJson(tones) {
+  return JSON.stringify(tones.map(t => ({
+    note: t.midi === 0 ? 'silence' : midiToNoteName(t.midi),
+    midi: t.midi,
+    duration: Math.round(t.duration * 1000) / 1000
+  })), null, 2);
+}
+
+function jsonToTones(json) {
+  const arr = JSON.parse(json);
+  if (!Array.isArray(arr)) throw new Error('Must be an array');
+  return arr.map((t, i) => {
+    const midi = typeof t.midi === 'number' ? t.midi : 0;
+    const duration = typeof t.duration === 'number' ? t.duration : 0;
+    if (midi < 0 || midi > 127) throw new Error(`Tone ${i + 1}: midi must be 0-127`);
+    if (duration <= 0 || duration > 2.55) throw new Error(`Tone ${i + 1}: duration must be 0-2.55s`);
+    return { midi, duration };
+  });
+}
+
+function updateOutput() {
+  const editorSection = document.getElementById('editorSection');
+  const outputSection = document.getElementById('outputSection');
+  if (recordedTones.length === 0) {
+    editorSection.classList.add('hidden');
+    outputSection.classList.add('hidden');
+    return;
+  }
+  editorSection.classList.remove('hidden');
+  outputSection.classList.remove('hidden');
+  document.getElementById('jsonEditor').value = tonesToJson(recordedTones);
+  document.getElementById('editorError').textContent = '';
+  const code = encodeTones(recordedTones);
+  document.getElementById('cmdOutput').innerHTML = `<span class="text-gray-500">$ </span>claude-bell create "My Sound" ${code}`;
+}
+
+function applyJson() {
+  const errorEl = document.getElementById('editorError');
+  try {
+    const tones = jsonToTones(document.getElementById('jsonEditor').value);
+    recordedTones = tones;
+    renderTones();
+    errorEl.textContent = '';
+    const code = encodeTones(recordedTones);
+    document.getElementById('cmdOutput').innerHTML = `<span class="text-gray-500">$ </span>claude-bell create "My Sound" ${code}`;
+  } catch (e) {
+    errorEl.textContent = e.message;
+  }
+}
+
+function playToneSequence(tones) {
+  const ctx = getAudioCtx();
+  let time = ctx.currentTime;
+  for (const t of tones) {
+    if (t.midi === 0) { time += t.duration; continue; }
+    const freq = midiToFreq(t.midi);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = 0;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.linearRampToValueAtTime(0.5, time + 0.005);
+    gain.gain.setValueAtTime(0.5, time + t.duration - 0.005);
+    gain.gain.linearRampToValueAtTime(0, time + t.duration);
+    osc.start(time);
+    osc.stop(time + t.duration);
+    time += t.duration;
+  }
+}
+
+function previewFromEditor() {
+  const errorEl = document.getElementById('editorError');
+  try {
+    const tones = jsonToTones(document.getElementById('jsonEditor').value);
+    errorEl.textContent = '';
+    playToneSequence(tones);
+  } catch (e) {
+    errorEl.textContent = e.message;
+  }
+}
+
+function previewSound() {
+  if (recordedTones.length === 0) return;
+  playToneSequence(recordedTones);
+}
+
+function copyCode() {
+  const cmd = document.getElementById('cmdOutput').textContent.replace(/^\$ /, '');
+  navigator.clipboard.writeText(cmd).then(() => {
+    document.getElementById('copyIcon').classList.add('hidden');
+    document.getElementById('checkIcon').classList.remove('hidden');
+    setTimeout(() => {
+      document.getElementById('copyIcon').classList.remove('hidden');
+      document.getElementById('checkIcon').classList.add('hidden');
+    }, 1500);
+  });
+}
+
+// -- Keyboard shortcuts --
+const pressedKeys = {};
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'TEXTAREA') return;
+  if (e.repeat) return;
+  const key = e.key.toLowerCase();
+  if (KEY_MAP[key] !== undefined && !pressedKeys[key]) {
+    pressedKeys[key] = true;
+    const midi = KEY_MAP[key];
+    const el = document.querySelector(`[data-midi="${midi}"]`);
+    noteOn(midi, el);
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  if (e.target.tagName === 'TEXTAREA') return;
+  const key = e.key.toLowerCase();
+  if (KEY_MAP[key] !== undefined) {
+    delete pressedKeys[key];
+    const midi = KEY_MAP[key];
+    const el = document.querySelector(`[data-midi="${midi}"]`);
+    noteOff(midi, el);
+  }
+});
+
+// -- Init --
+buildKeyboard();
+</script>
+</body>
+</html>

@@ -23,6 +23,12 @@ func main() {
 		cmdUninstall()
 	case "play":
 		cmdPlay()
+	case "create":
+		cmdCreate()
+	case "list":
+		cmdList()
+	case "delete":
+		cmdDelete()
 	case "help", "--help", "-h":
 		printUsage()
 	default:
@@ -39,11 +45,14 @@ Usage:
   claude-bell <command>
 
 Commands:
-  setup       Interactive setup: pick a sound for each event
-  test        Play all configured sounds
-  install     Add hooks to ~/.claude/settings.json
-  uninstall   Remove hooks from ~/.claude/settings.json
-  play <event>  Play sound for an event (used by hooks)
+  setup                  Interactive setup: pick a sound for each event
+  test                   Play all configured sounds
+  install                Add hooks to ~/.claude/settings.json
+  uninstall              Remove hooks from ~/.claude/settings.json
+  play <event>           Play sound for an event (used by hooks)
+  create <name> <code>   Create a custom sound from an encoded string
+  list                   List all custom sounds
+  delete <name>          Delete a custom sound
 `)
 }
 
