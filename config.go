@@ -7,9 +7,10 @@ import (
 )
 
 type Config struct {
-	Stop         string `json:"stop,omitempty"`
-	Notification string `json:"notification,omitempty"`
-	Limit        string `json:"limit,omitempty"`
+	Stop         string  `json:"stop,omitempty"`
+	Notification string  `json:"notification,omitempty"`
+	Limit        string  `json:"limit,omitempty"`
+	Volume       float64 `json:"volume"`
 }
 
 func configDir() string {
@@ -37,7 +38,7 @@ func claudeSettingsPath() string {
 }
 
 func loadConfig() (Config, error) {
-	var cfg Config
+	cfg := Config{Volume: 1.0}
 	data, err := os.ReadFile(configPath())
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -45,8 +46,25 @@ func loadConfig() (Config, error) {
 		}
 		return cfg, err
 	}
-	err = json.Unmarshal(data, &cfg)
-	return cfg, err
+
+	var disk struct {
+		Stop         string   `json:"stop,omitempty"`
+		Notification string   `json:"notification,omitempty"`
+		Limit        string   `json:"limit,omitempty"`
+		Volume       *float64 `json:"volume"`
+	}
+	if err := json.Unmarshal(data, &disk); err != nil {
+		return cfg, err
+	}
+
+	cfg.Stop = disk.Stop
+	cfg.Notification = disk.Notification
+	cfg.Limit = disk.Limit
+	if disk.Volume != nil {
+		cfg.Volume = clampVolume(*disk.Volume)
+	}
+
+	return cfg, nil
 }
 
 func getConfigField(cfg Config, event string) string {
@@ -78,9 +96,21 @@ func saveConfig(cfg Config) error {
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
 	}
+	cfg.Volume = clampVolume(cfg.Volume)
 	data, err := json.MarshalIndent(cfg, "", "  ")
 	if err != nil {
 		return err
 	}
 	return os.WriteFile(configPath(), data, 0644)
+}
+
+func clampVolume(v float64) float64 {
+	switch {
+	case v < 0:
+		return 0
+	case v > 1:
+		return 1
+	default:
+		return v
+	}
 }

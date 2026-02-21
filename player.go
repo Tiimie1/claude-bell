@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 )
 
 func ensureSound(event, presetName string) (string, error) {
@@ -48,8 +49,9 @@ func ensureSound(event, presetName string) (string, error) {
 }
 
 // playSound plays a WAV file using afplay. It blocks until playback finishes.
-func playSound(path string) error {
-	cmd := exec.Command("afplay", path)
+func playSound(path string, volume float64) error {
+	vol := clampVolume(volume)
+	cmd := exec.Command("afplay", "-v", strconv.FormatFloat(vol, 'f', 2, 64), path)
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }

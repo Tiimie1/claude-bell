@@ -29,6 +29,8 @@ func main() {
 		cmdList()
 	case "delete":
 		cmdDelete()
+	case "volume":
+		cmdVolume()
 	case "help", "--help", "-h":
 		printUsage()
 	default:
@@ -53,6 +55,7 @@ Commands:
   create <name> <code>   Create a custom sound from an encoded string
   list                   List all custom sounds
   delete <name>          Delete a custom sound
+  volume [value]         Show or set playback volume (0-1, 0-100, or %)
 `)
 }
 
@@ -92,7 +95,7 @@ func cmdPlay() {
 		os.Exit(1)
 	}
 
-	if err := playSound(path); err != nil {
+	if err := playSound(path, cfg.Volume); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -126,7 +129,7 @@ func cmdTest() {
 			fmt.Fprintf(os.Stderr, "  error: %v\n", err)
 			continue
 		}
-		if err := playSound(path); err != nil {
+		if err := playSound(path, cfg.Volume); err != nil {
 			fmt.Fprintf(os.Stderr, "  playback error: %v\n", err)
 		}
 	}
