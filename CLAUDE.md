@@ -33,3 +33,24 @@ Use conventional commit prefixes for all commit messages:
 - `cicd:` - CI/CD pipeline changes
 
 Example: `feat: add dark mode toggle`
+
+## Releasing (GoReleaser + Homebrew)
+
+To publish a new release and update the Homebrew tap (`Tiimie1/homebrew-tap`):
+
+1. Tag the release (GoReleaser derives the version from git tags):
+   ```bash
+   git tag -a v0.x.x -m "Release v0.x.x"
+   git push origin v0.x.x
+   ```
+
+2. Run GoReleaser (requires a `GITHUB_TOKEN` with repo write access):
+   ```bash
+   GITHUB_TOKEN=<your-token> goreleaser release --clean
+   ```
+   If the token is already exported in your shell, just run:
+   ```bash
+   goreleaser release --clean
+   ```
+
+GoReleaser will build binaries for darwin amd64/arm64, create a GitHub release, and push the updated formula to the Homebrew tap automatically.
