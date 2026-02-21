@@ -72,6 +72,7 @@ claude-bell play <event>           Play sound for an event (used by hooks)
 claude-bell create <name> <code>   Create a custom sound from an encoded string
 claude-bell list                   List all custom sounds
 claude-bell delete <name>          Delete a custom sound
+claude-bell volume [value]         Show/set playback volume (0-1, 0-100, or %)
 ```
 
 ## How it works
@@ -80,7 +81,21 @@ claude-bell delete <name>          Delete a custom sound
 2. `claude-bell install` writes async [hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) into `~/.claude/settings.json`
 3. When Claude Code triggers an event, it runs `claude-bell play <event>`, which generates a WAV file (cached) and plays it via `afplay`
 
-Config is stored in `~/.config/claude-bell/config.json`. Generated WAV files are cached in `~/.config/claude-bell/sounds/`.
+Config is stored in `~/.config/claude-bell/config.json` (including volume). Generated WAV files are cached in `~/.config/claude-bell/sounds/`.
+
+## Volume control
+
+```bash
+# Show current volume
+claude-bell volume
+
+# Set to 65%
+claude-bell volume 65
+# or
+claude-bell volume 0.65
+# or
+claude-bell volume 65%
+```
 
 ## Available sounds
 
